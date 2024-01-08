@@ -1,46 +1,57 @@
-# Getting Started with Create React App
+# Methane Detection UI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+The Methane Detection UI is a web-based application designed to visualize methane concentrations across various locations. Utilizing interactive graphs and maps, this tool aims to provide a user-friendly interface for analyzing and understanding methane levels, which is crucial for environmental monitoring and research.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **Interactive Graphs**: Includes line and bar graphs to display methane concentration trends over time.
+- **Dynamic Mapping**: Integrates an interactive map to visualize methane concentrations geographically.
+- **Responsive Design**: Ensures a seamless user experience across various devices and screen sizes.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Technologies
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- **React**: A JavaScript library for building user interfaces.
+- **TypeScript**: An open-source language which builds on JavaScript by adding static type definitions.
+- **Leaflet**: An open-source JavaScript library for mobile-friendly interactive maps.
+- **Chart.js**: Simple yet flexible JavaScript charting for designers & developers.
 
-### `npm test`
+## Getting Started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Prerequisites
 
-### `npm run build`
+- Node.js
+- npm (Node Package Manager)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Astro-027/methane-detection-ui.git
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Navigate to the project directory:
+   ```bash
+   cd methane-detection-ui
+   ```
 
-### `npm run eject`
+3. Start the application:
+   ```bash
+   npm start
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Usage
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Viewing Graphs: Navigate to the graphs section to view the line and bar graphs representing methane data.
+- Exploring the Map: Use the map to visually explore methane concentrations across different regions. Zoom and pan to view different areas.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Future Enhancements
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Data Integration: Implement real-time data fetching to display current methane levels.
+- User Interaction: Enhance map functionality to allow users to click on specific regions for detailed data.
+- Customization: Add options for users to customize the data display, such as selecting specific time frames.
 
-## Learn More
+### License
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+This project is licensed under the *MIT License*.

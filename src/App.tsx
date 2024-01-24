@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
-import { LineGraph } from './components/LineGraph';
-import { BarGraph } from './components/BarGraph';
+// import { LineGraph } from './components/LineGraph';
+// import { BarGraph } from './components/BarGraph';
 import MapComponent from './components/Map';
 
 function App() {

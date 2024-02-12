@@ -3,54 +3,66 @@ import { MapContainer, TileLayer, Rectangle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+interface DataPoint {
+  lat: number;
+  lng: number;
+  concentration: number;
+}
+
 const MapComponent = () => {
   const bounds = new L.LatLngBounds(
     new L.LatLng(33, -83.5), // Southwest coordinates
     new L.LatLng(35, -81)    // Northeast coordinates
   );
 
-  // DynamicOverlay defined inside MapComponent
   const DynamicOverlay = () => {
     const map = useMap();
     const [zoomLevel, setZoomLevel] = useState(map.getZoom());
-  
+    const [dataPoints, setDataPoints] = useState<DataPoint[]>([]);
+
     useEffect(() => {
       const zoomEndHandler = () => {
         setZoomLevel(map.getZoom());
       };
-  
+
       map.on('zoomend', zoomEndHandler);
+
+      // Fetch and parse the SimulatedData.txt file
+      fetch('/data/SimulatedData.txt')
+        .then(response => response.text())
+        .then(text => {
+          const lines = text.trim().split('\n').slice(1); // Skip the first line with column names
+          const points = lines.map(line => {
+            const parts = line.trim().split(/\s+/);
+            return {
+              lat: parseFloat(parts[1]), // Assuming latitude is the second column
+              lng: parseFloat(parts[2]), // Assuming longitude is the third column
+              concentration: parseFloat(parts[3]), // Assuming concentration is the fourth column
+            };
+          });
+          setDataPoints(points);
+        });
+
       return () => {
         map.off('zoomend', zoomEndHandler);
       };
     }, [map]);
-  
+
     const calculateSquares = () => {
       let squares = [];
-    
+
       if (zoomLevel > 13) {
         // Higher zoom level - show detailed data
-        const areaBounds = {
-          sw: { lat: 34.6734, lng: -82.8474 }, // Southwest corner of the area
-          ne: { lat: 34.6934, lng: -82.8274 }  // Northeast corner of the area
-        };
-        const size = 0.005; // Smaller size for detailed data
-    
-        // Generate multiple points within the area
-        for (let lat = areaBounds.sw.lat; lat < areaBounds.ne.lat; lat += size) {
-          for (let lng = areaBounds.sw.lng; lng < areaBounds.ne.lng; lng += size) {
-            squares.push(
-              <Rectangle
-                key={`${lat}-${lng}`}
-                bounds={[
-                  [lat, lng],
-                  [lat + size, lng + size]
-                ]}
-                color="blue"
-              />
-            );
-          }
-        }
+        squares = dataPoints.map((point, index) => (
+          <Rectangle
+            key={index}
+            bounds={[
+              [point.lat - 0.005 / 2, point.lng - 0.005 / 2],
+              [point.lat + 0.005 / 2, point.lng + 0.005 / 2]
+            ]}
+            color="blue"
+          />
+        ));
       } else {
         // Lower zoom level - show aggregated data
         const aggregatedData = { lat: 34.6834, lng: -82.8374 };
@@ -66,10 +78,10 @@ const MapComponent = () => {
           />
         ];
       }
-    
+
       return squares;
     };
-  
+
     return <>{calculateSquares()}</>;
   };
 

@@ -1,92 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Rectangle, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import React, { useEffect, useRef } from "react";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import "leaflet.markercluster";
 
-interface DataPoint {
-  lat: number;
-  lng: number;
-  concentration: number;
-}
+// Define a new default icon with correct paths for TypeScript
+const defaultIcon = new L.Icon({
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+L.Marker.prototype.options.icon = defaultIcon;
 
 const DynamicOverlay = () => {
-  const [dataPoints, setDataPoints] = useState<DataPoint[]>([]);
-  const [visiblePoints, setVisiblePoints] = useState<DataPoint[]>([]);
-
-  // Custom hook to handle map events and update visible points
-  const map = useMapEvents({
-    zoomend: () => {
-      updateVisiblePoints();
-    },
-    moveend: () => {
-      updateVisiblePoints();
-    }
-  });
+  const map = useMap();
+  const markerClusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
 
   useEffect(() => {
-    // Fetch and parse the SimulatedData.txt file
-    fetch('/data/SimulatedData.txt')
-      .then(response => response.text())
-      .then(text => {
-        const lines = text.trim().split('\n').slice(1); // Skip the header line
-        const points = lines.map(line => {
+    if (!map) return;
+
+    const markerClusterGroup = L.markerClusterGroup();
+    markerClusterGroupRef.current = markerClusterGroup;
+    map.addLayer(markerClusterGroup);
+
+    fetch("/data/SimulatedData.txt")
+      .then((response) => response.text())
+      .then((text) => {
+        const lines = text.trim().split("\n").slice(1);
+        lines.forEach((line) => {
           const parts = line.trim().split(/\s+/);
-          return {
-            lat: parseFloat(parts[1]),
-            lng: parseFloat(parts[2]),
-            concentration: parseFloat(parts[3]),
-          };
+          const lat = parseFloat(parts[1]);
+          const lng = parseFloat(parts[2]);
+          const marker = L.marker([lat, lng]);
+          markerClusterGroup.addLayer(marker);
         });
-        setDataPoints(points);
-        setVisiblePoints(points); // Initialize visible points
       });
-  }, []);
 
-  // Function to update visible points based on the current map bounds
-  const updateVisiblePoints = () => {
-    const bounds = map.getBounds();
-    const pointsInView = dataPoints.filter(point => bounds.contains(L.latLng(point.lat, point.lng)));
-    setVisiblePoints(pointsInView);
-  };
+    return () => {
+      markerClusterGroupRef.current &&
+        map.removeLayer(markerClusterGroupRef.current);
+    };
+  }, [map]);
 
-  const calculateSquares = () => {
-    return visiblePoints.map((point, index) => (
-      <Rectangle
-        key={index}
-        bounds={[
-          [point.lat - 0.005 / 2, point.lng - 0.005 / 2],
-          [point.lat + 0.005 / 2, point.lng + 0.005 / 2]
-        ]}
-        color="blue"
-      />
-    ));
-  };
-
-  return <>{calculateSquares()}</>;
+  return null;
 };
 
 const MapComponent = () => {
+
   const bounds = new L.LatLngBounds(
     new L.LatLng(31, -83), // Southwest coordinates
     new L.LatLng(35, -81)    // Northeast coordinates
   );
 
   return (
-    <MapContainer 
-      center={[32.9, -82.005]} 
-      zoom={12}
-      minZoom={10}
-      maxZoom={18}
-      maxBounds={bounds}
-      style={{ height: '100vh', width: '100%' }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      <DynamicOverlay />
-    </MapContainer>
+  <MapContainer
+    center={[34.6834, -82.8374]}
+    zoom={12}
+    minZoom={6}
+    maxZoom={18}
+    maxBounds={bounds}
+    style={{ height: "100vh", width: "100%" }}
+  >
+    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <DynamicOverlay />
+  </MapContainer>
   );
-};
+  };
 
 export default MapComponent;

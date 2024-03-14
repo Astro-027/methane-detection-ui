@@ -24,14 +24,19 @@ const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn }) => {
     const fetchAndAddHeatLayer = async () => {
       const response = await fetch('/data/UpdatedSimulatedData.txt');
       const text = await response.text();
-      const lines = text.trim().split('\n').slice(1);
-      const heatMapData = lines.map(line => {
+      const lines = text.trim().split('\n').slice(1); // Skip header line
+      // Explicitly define the type of the accumulator as an array of arrays of numbers
+      const heatMapData = lines.reduce<number[][]>((acc, line) => {
         const parts = line.trim().split(/\s+/);
         const lat = parseFloat(parts[1]);
         const lng = parseFloat(parts[2]);
         const intensity = parseFloat(parts[selectedColumn]);
-        return [lat, lng, intensity];
-      });
+        // Only add data points with intensity >= 0
+        if (intensity >= -0.05) {
+          acc.push([lat, lng, intensity]);
+        }
+        return acc;
+      }, []); // Initialize the accumulator as an empty array of type number[][]
 
       removeExistingHeatLayer();
 

@@ -6,48 +6,45 @@ import 'leaflet.heat';
 
 interface HeatMapOverlayProps {
   selectedColumn: number;
+  selectedFilePath: string; // Add a prop for the selected file path
 }
 
-const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn }) => {
+const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn, selectedFilePath }) => {
   const map = useMap();
-  const heatLayerRef = useRef<L.Layer>(); // Ref to keep track of the current heat layer
-
+  const heatLayerRef = useRef<L.Layer>();
 
   useEffect(() => {
     const removeExistingHeatLayer = () => {
       if (heatLayerRef.current) {
         map.removeLayer(heatLayerRef.current);
-        heatLayerRef.current = undefined; // Clear the ref after removing the layer
+        heatLayerRef.current = undefined;
       }
     };
 
     const fetchAndAddHeatLayer = async () => {
-      const response = await fetch('/data/scaled/NewUpdatedSimulatedData.txt');
+      const response = await fetch(selectedFilePath); // Use the selected file path
       const text = await response.text();
-      const lines = text.trim().split('\n').slice(1); // Skip header line
-      // Explicitly define the type of the accumulator as an array of arrays of numbers
+      const lines = text.trim().split('\n').slice(1);
       const heatMapData = lines.reduce<number[][]>((acc, line) => {
         const parts = line.trim().split(/\s+/);
         const lat = parseFloat(parts[1]);
         const lng = parseFloat(parts[2]);
         const intensity = parseFloat(parts[selectedColumn]);
-        // Only add data points with intensity >= 0
         if (intensity >= -0.096) {
           acc.push([lat, lng, intensity]);
         }
         return acc;
-      }, []); // Initialize the accumulator as an empty array of type number[][]
+      }, []);
 
       removeExistingHeatLayer();
 
-      // Create and add the new heat layer
       const heatLayer = (L as any).heatLayer(heatMapData, {
         radius: 25,
         blur: 15,
         maxZoom: 17,
       }).addTo(map);
 
-      heatLayerRef.current = heatLayer; // Store the new layer in the ref
+      heatLayerRef.current = heatLayer;
     };
 
     fetchAndAddHeatLayer();
@@ -55,13 +52,14 @@ const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn }) => {
     return () => {
       removeExistingHeatLayer();
     };
-  }, [map, selectedColumn]);
+  }, [map, selectedColumn, selectedFilePath]); // Add selectedFilePath to the dependency array
 
   return null;
 };
 
 const MapComponent = () => {
   const [selectedColumn, setSelectedColumn] = useState(4);
+  const [selectedFilePath, setSelectedFilePath] = useState('/data/scaled/NewUpdatedSimulatedData.txt'); // Default file path
 
   const bounds = new L.LatLngBounds(
     new L.LatLng(31, -83),
@@ -79,12 +77,17 @@ const MapComponent = () => {
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <HeatMapOverlay selectedColumn={selectedColumn} />
+        <HeatMapOverlay selectedColumn={selectedColumn} selectedFilePath={selectedFilePath} />
       </MapContainer>
       <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000 }}>
         <select value={selectedColumn} onChange={e => setSelectedColumn(parseInt(e.target.value, 10))}>
           <option value={4}>MSS</option>
           <option value={5}>MMMS</option>
+        </select>
+        <select value={selectedFilePath} onChange={e => setSelectedFilePath(e.target.value)}>
+          <option value='/data/scaled/NewUpdatedSimulatedData.txt'>Data File 1</option>
+          <option value='/data/scaled/NewUpdatedSimulatedDataHR-Part1.txt'>Data File 2</option>
+          <option value='/data/scaled/NewUpdatedSimulatedDataHR-Part2.txt'>Data File 3</option>
         </select>
       </div>
     </div>

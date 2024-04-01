@@ -6,10 +6,12 @@ import 'leaflet.heat';
 
 interface HeatMapOverlayProps {
   selectedColumn: number;
-  selectedFilePath: string; // Add a prop for the selected file path
+  selectedFilePath: string;
+  selectedTime: number;
+  minIntensity: number; // Add a prop for minimum intensity
 }
 
-const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn, selectedFilePath }) => {
+const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn, selectedFilePath, selectedTime, minIntensity }) => {
   const map = useMap();
   const heatLayerRef = useRef<L.Layer>();
 
@@ -22,19 +24,21 @@ const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn, selecte
     };
 
     const fetchAndAddHeatLayer = async () => {
-      const response = await fetch(selectedFilePath); // Use the selected file path
+      const response = await fetch(selectedFilePath);
       const text = await response.text();
       const lines = text.trim().split('\n').slice(1);
-      const heatMapData = lines.reduce<number[][]>((acc, line) => {
+      const filteredData = lines.filter(line => {
+        const parts = line.trim().split(/\s+/);
+        const time = parseFloat(parts[0]); // Assuming time is the first column
+        return time === selectedTime; // Filter by selectedTime
+      });
+      const heatMapData = filteredData.map(line => {
         const parts = line.trim().split(/\s+/);
         const lat = parseFloat(parts[1]);
         const lng = parseFloat(parts[2]);
         const intensity = parseFloat(parts[selectedColumn]);
-        if (intensity >= -0.096) {
-          acc.push([lat, lng, intensity]);
-        }
-        return acc;
-      }, []);
+        return intensity >= minIntensity ? [lat, lng, intensity] : null; // Filter by minIntensity
+      }).filter(point => point !== null); // Remove null points
 
       removeExistingHeatLayer();
 
@@ -52,14 +56,16 @@ const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn, selecte
     return () => {
       removeExistingHeatLayer();
     };
-  }, [map, selectedColumn, selectedFilePath]); // Add selectedFilePath to the dependency array
+  }, [map, selectedColumn, selectedFilePath, selectedTime, minIntensity]); // Include minIntensity in the dependency array
 
   return null;
 };
 
 const MapComponent = () => {
   const [selectedColumn, setSelectedColumn] = useState(4);
-  const [selectedFilePath, setSelectedFilePath] = useState('/data/scaled/NewUpdatedSimulatedData.txt'); // Default file path
+  const [selectedFilePath, setSelectedFilePath] = useState('/data/scaled/NewUpdatedSimulatedData.txt');
+  const [selectedTime, setSelectedTime] = useState(12);
+  const [minIntensity, setMinIntensity] = useState(-0.096); // State for minimum intensity
 
   const bounds = new L.LatLngBounds(
     new L.LatLng(31, -83),
@@ -77,7 +83,7 @@ const MapComponent = () => {
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <HeatMapOverlay selectedColumn={selectedColumn} selectedFilePath={selectedFilePath} />
+        <HeatMapOverlay selectedColumn={selectedColumn} selectedFilePath={selectedFilePath} selectedTime={selectedTime} minIntensity={minIntensity} />
       </MapContainer>
       <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000 }}>
         <select value={selectedColumn} onChange={e => setSelectedColumn(parseInt(e.target.value, 10))}>
@@ -89,6 +95,23 @@ const MapComponent = () => {
           <option value='/data/scaled/NewUpdatedSimulatedDataHR-Part1.txt'>Data File 2</option>
           <option value='/data/scaled/NewUpdatedSimulatedDataHR-Part2.txt'>Data File 3</option>
         </select>
+        {/* Slider for selecting time */}
+        <input
+          type="range"
+          min="12"
+          max="36"
+          value={selectedTime}
+          onChange={e => setSelectedTime(parseInt(e.target.value, 10))}
+          style={{ marginLeft: '20px' }}
+        />
+        <span style={{ marginLeft: '10px' }}>{selectedTime}</span> {/* Display the current selected time */}
+        {/* Input for minimum intensity */}
+        <input
+          type="number"
+          value={minIntensity}
+          onChange={e => setMinIntensity(parseFloat(e.target.value))}
+          style={{ marginLeft: '20px' }}
+        />
       </div>
     </div>
   );

@@ -22,7 +22,7 @@ const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn }) => {
     };
 
     const fetchAndAddHeatLayer = async () => {
-      const response = await fetch('/data/UpdatedSimulatedData.txt');
+      const response = await fetch('/data/scaled/NewUpdatedSimulatedData.txt');
       const text = await response.text();
       const lines = text.trim().split('\n').slice(1); // Skip header line
       // Explicitly define the type of the accumulator as an array of arrays of numbers
@@ -32,7 +32,7 @@ const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn }) => {
         const lng = parseFloat(parts[2]);
         const intensity = parseFloat(parts[selectedColumn]);
         // Only add data points with intensity >= 0
-        if (intensity >= -0.05) {
+        if (intensity >= -0.096) {
           acc.push([lat, lng, intensity]);
         }
         return acc;
@@ -61,7 +61,7 @@ const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn }) => {
 };
 
 const MapComponent = () => {
-  const [selectedColumn, setSelectedColumn] = useState(8);
+  const [selectedColumn, setSelectedColumn] = useState(4);
 
   const bounds = new L.LatLngBounds(
     new L.LatLng(31, -83),
@@ -83,8 +83,8 @@ const MapComponent = () => {
       </MapContainer>
       <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000 }}>
         <select value={selectedColumn} onChange={e => setSelectedColumn(parseInt(e.target.value, 10))}>
-          <option value={8}>MSS</option>
-          <option value={9}>MMMS</option>
+          <option value={4}>MSS</option>
+          <option value={5}>MMMS</option>
         </select>
       </div>
     </div>

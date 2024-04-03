@@ -8,7 +8,7 @@ interface HeatMapOverlayProps {
   selectedColumn: number;
   selectedFilePath: string;
   selectedTime: number;
-  minIntensity: number; // Add a prop for minimum intensity
+  minIntensity: number;
 }
 
 const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn, selectedFilePath, selectedTime, minIntensity }) => {
@@ -29,7 +29,7 @@ const HeatMapOverlay: React.FC<HeatMapOverlayProps> = ({ selectedColumn, selecte
       const lines = text.trim().split('\n').slice(1);
       const filteredData = lines.filter(line => {
         const parts = line.trim().split(/\s+/);
-        const time = parseFloat(parts[0]); // Assuming time is the first column
+        const time = parseFloat(parts[0]);
         return time === selectedTime; // Filter by selectedTime
       });
       const heatMapData = filteredData.map(line => {
@@ -69,7 +69,7 @@ const MapComponent = () => {
 
   const bounds = new L.LatLngBounds(
     new L.LatLng(31, -83),
-    new L.LatLng(35, -81)
+    new L.LatLng(35, -80)
   );
 
   return (

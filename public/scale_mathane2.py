@@ -1,9 +1,9 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
-file_path = 'public/data/original/SimulatedDataHR-Part2.txt'
+file_path = 'public/data/scaled/NewUpdatedSimulatedData.txt'
 
-data = pd.read_fwf(file_path, colspecs=[(0,8), (19,27), (31,40), (185,196)]) 
+data = pd.read_fwf(file_path) 
 
 # Convert 'Methane' column to numeric, forcing non-numeric values to NaN
 # data['Methane'] = pd.to_numeric(data['Methane'], errors='coerce')
@@ -13,7 +13,7 @@ data = pd.read_fwf(file_path, colspecs=[(0,8), (19,27), (31,40), (185,196)])
 # print("Shape after conversion:", data.shape)
 
 # Print a sample of the 'Methane' column after conversion
-print(data)
+print(data["Time"])
 
 # Temporarily comment out the dropping of NaNs to explore the data
 # data.dropna(subset=['Methane'], inplace=True)

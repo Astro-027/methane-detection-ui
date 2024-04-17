@@ -109,7 +109,7 @@ const MapComponent = () => {
         <input
           type="number"
           value={minIntensity}
-          onChange={e => setMinIntensity(parseFloat(e.target.value))}
+          onChange={e => setMinIntensity(parseFloat(e.target.value))} // Selection for minIntesity
           style={{ marginLeft: '20px' }}
         />
       </div>

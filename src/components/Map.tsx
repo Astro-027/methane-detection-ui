@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
+import { Link } from 'react-router-dom';
 
 interface HeatMapOverlayProps {
   selectedColumn: number;
@@ -94,14 +95,17 @@ const MapComponent = () => {
           <option value='/data/scaled/NewUpdatedSimulatedData.txt'>Data File 1</option>
           <option value='/data/scaled/NewUpdatedSimulatedDataHR-Part1.txt'>Data File 2</option>
           <option value='/data/scaled/NewUpdatedSimulatedDataHR-Part2.txt'>Data File 3</option>
+          <option value='/data/scaled/NewUpdatedSimulatedDataHR3-Part1.txt'>Data File 4</option>
+          <option value='/data/scaled/NewUpdatedSimulatedDataHR3-Part2.txt'>Data File 5</option>
         </select>
         {/* Slider for selecting time */}
         <input
           type="range"
-          min="12"
-          max="36"
+          min="12.0"
+          max="36.0"
+          step="0.1"
           value={selectedTime}
-          onChange={e => setSelectedTime(parseInt(e.target.value, 10))}
+          onChange={e => setSelectedTime(parseFloat(e.target.value))}
           style={{ marginLeft: '20px' }}
         />
         <span style={{ marginLeft: '10px' }}>{selectedTime}</span> {/* Display the current selected time */}
@@ -112,6 +116,11 @@ const MapComponent = () => {
           onChange={e => setMinIntensity(parseFloat(e.target.value))} // Selection for minIntesity
           style={{ marginLeft: '20px' }}
         />
+      </div>
+      <div>
+        <Link to="/data-visualization">
+          <button>Go to Data Visualization</button>
+        </Link>
       </div>
     </div>
   );

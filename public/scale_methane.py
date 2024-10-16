@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 # Adjust the file path as needed
-file_path = 'public/data/original/SimulatedDataHR-Part2.txt'
+file_path = 'public/data/original/SimulatedDataHR3-Part2.txt'
 
 # Use colspecs to read specific columns
 data = pd.read_fwf(file_path, colspecs=[(0,8), (19,27), (31,40), (185,196)])
@@ -28,7 +28,7 @@ data['MMMS'] = minmax_scaler.fit_transform(data[['Methane']])
 formatted_data = data.to_string(index=False, header=True, col_space=15)
 
 # Save the formatted string to a new file
-with open('public/data/scaled/NewUpdatedSimulatedDataHR-Part2.txt', 'w') as file:
+with open('public/data/scaled/NewUpdatedSimulatedDataHR3-Part2.txt', 'w') as file:
     file.write(formatted_data)
 
 

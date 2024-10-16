@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const DataVisualization = ({ filePath = '/data/scaled/NewUpdatedSimulatedData.txt' }) => {
     const [dataContent, setDataContent] = useState('');
@@ -20,6 +21,11 @@ const DataVisualization = ({ filePath = '/data/scaled/NewUpdatedSimulatedData.tx
 
     return (
         <div style={{ whiteSpace: 'pre', fontFamily: 'monospace', margin: '20px' }}>
+            <div>
+                <Link to="/">
+                    <button>Back to Main</button>
+                </Link>
+            </div>
             {dataContent}
         </div>
     );
